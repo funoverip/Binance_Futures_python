@@ -26,7 +26,17 @@ class UrlParamsBuilder(object):
     def build_url(self):
         if len(self.param_map) == 0:
             return ""
+        # Error -1022: Signature for this request is not valid.
+        # => Ensure 'signature' parameter is at the end of the URL, as per doc.
+        signature = ''
+        if 'signature' in self.param_map:
+            # Remove it from the (unsorted) dic and append manually
+            signature = self.param_map['signature']
+            del self.param_map['signature']
+            signature = "&signature=%s" % signature
         encoded_param = urllib.parse.urlencode(self.param_map)
+        # Append the signature manually. URL encoding is not necessary here.
+        encoded_param += signature
         return encoded_param
 
     def build_url_to_json(self):
